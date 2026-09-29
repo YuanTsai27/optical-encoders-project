@@ -1,7 +1,8 @@
+#include "Absolute_encoder.h"
+
 // TO DO:
 
 //1. Add function that returns reading from 1 sensor.
-
 
 //2. Add function that reads all sensors and returns gray code in an array(proabably).
 

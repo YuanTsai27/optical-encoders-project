@@ -1,3 +1,7 @@
+#include <Arduino.h>
+#include <HardwareSerial.h>
+#include <stdint.h>
+
 float deg=45; // Rotation degree
 float s = 0;  //Encoder counts
 int sm1 = 0;  //Built-in chanel 1

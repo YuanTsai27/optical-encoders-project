@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <stdint.h>
+#include <absolute_encoder.h>
 
 float deg=45; // Rotation degree
 float s = 0;  //Encoder counts

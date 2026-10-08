@@ -8,10 +8,10 @@ bool read_sensor(int pin, int threshold) {
 }
 
 //2. Add function that reads all sensors and returns gray code in a byte
-byte read_all_sensors() {
+byte read_all_sensors(const int pins[5], const int thresholds[5]) {
   byte gray_code = 0;
-  for (int i = 0; i < 5; i++) { // Assuming 5 sensors connected to pins 0-4 (change to appropriate pin numbers)
-    if (read_sensor(i, 1000)) { // Assuming threshold is 1000 for analogRead
+  for (int i = 0; i < 5; i++) {
+    if (read_sensor(pins[i], thresholds[i])) {
       gray_code |= (1 << i);
     }
   }
@@ -40,9 +40,31 @@ float convert_binary_to_degrees(byte binary_code) {
 
 //5. Save starting angle, and calculate difference compared to current angle
 //to calculate rotation. negative sign means counterclockwise rotation, positive sign means clockwise rotation.
-float calculate_rotation(float starting_angle, float current_angle) {
-    float rotation = current_angle - starting_angle;
-    return rotation;
+
+float calculate_angular_displacement(float initial_unwrapped_angle, float current_unwrapped_angle) {
+  return current_unwrapped_angle - initial_unwrapped_angle;
 }
+
+// in case of angle wrapping, we need to unwrap the angle to get the correct displacement. This function takes the raw angle, previous raw angle, and a reference to cumulative offset to keep track of the total rotation.
+float unwrap_angle(float raw_angle, float previous_raw_angle, float &cumulative_offset) {
+  float delta = raw_angle - previous_raw_angle;
+
+  if (delta > 180.0) {
+    cumulative_offset -= 360.0;
+  } else if (delta < -180.0) {
+    cumulative_offset += 360.0;
+  }
+
+  return raw_angle + cumulative_offset;
+}
+
+
+// This function determines the direction of rotation based on the displacement. It returns "CW" for clockwise, "CCW" for counterclockwise, and "--" for no movement.
+const char* get_direction(float displacement) {
+  if (displacement > 0) return "CW";
+  if (displacement < 0) return "CCW";
+  return "--";
+}
+
 
 //6. Find the mean of 8 out of 10 best readings.

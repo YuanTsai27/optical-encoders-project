@@ -25,8 +25,8 @@ int rep=1;     //Repetition indicator
 
 
 //CONFIG FOR OPTICAL ABSOLUTE ENCODER:
-const int sensorPins[5]     = {A0, A1, A2, A3, A4};   // 
-int thresholds[5]           = {512, 512, 512, 512, 512}; // calibrated for each channel
+const int sensorPins[5]     = {A0, A1, A2, A3, A4};   // A0 LSB, A4 MSB
+int thresholds[5]           = {512, 512, 512, 512, 512}; // calibrated for each channel (A0-A4)
 
 float lastUnwrappedAngle = 0.0;
 float cumulativeOffset = 0.0;

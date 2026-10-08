@@ -1,19 +1,19 @@
 // Standalone test for the optical quadrature encoder.
 // Kept separate from BaseCodeOne for now. Spin the shaft and watch the Serial Monitor.
 
-#include "quadrature_encoder.h"
+#include "quadrature-encoder.h"
 
 // ---------------- Configuration ----------------
 
 // PLACEHOLDERS: set to the analog pins the two phototransistor outputs are wired to.
 const uint8_t PIN_CHANNEL_A = A5;
-const uint8_t PIN_CHANNEL_B = A6;
+const uint8_t PIN_CHANNEL_B = A4;
 
 // ADC thresholds (0 to 1023). Output is active high: light through = high reading.
 // Measured: about 900 with light passing, about 100 when blocked (midpoint 500).
 // The gap between the two thresholds is the hysteresis band, centred on the midpoint.
-const int THRESHOLD_HIGH = 600;
-const int THRESHOLD_LOW = 400;
+const int THRESHOLD_HIGH = 550;
+const int THRESHOLD_LOW = 450;
 
 // 32 segments on the outer track (16 black, 16 clear) = 32 edges per channel.
 // Two channels in quadrature = 64 edges per revolution = 5.625 degrees per edge.
@@ -45,13 +45,14 @@ const char *direction_to_text(Direction direction) {
 }
 
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(250000);
     encoder.begin();
     Serial.println(F("Optical quadrature encoder test"));
 }
 
 void loop() {
     encoder.update();
+    analogWrite(6, 150);
 
     if (CALIBRATION_MODE) {
         unsigned long now = millis();

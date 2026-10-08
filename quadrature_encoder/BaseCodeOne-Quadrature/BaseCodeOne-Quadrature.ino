@@ -1,4 +1,4 @@
-#include "quadrature_encoder.h"
+#include "quadrature-encoder.h"
 
 int b = 0; // reading the time for main loop to be run for 15s
 int c = 0; // memory for the time in mainloop
@@ -29,9 +29,9 @@ int repeat = 0; // repeat indicator to only let the memory of time for the Purpo
 
 // STUFF FOR OUR OWN IMPLEMENTATION:
 const uint8_t PIN_CHANNEL_A = A5;
-const uint8_t PIN_CHANNEL_B = A6;
-const int THRESHOLD_HIGH = 600;
-const int THRESHOLD_LOW = 400;
+const uint8_t PIN_CHANNEL_B = A4;
+const int THRESHOLD_HIGH = 550;
+const int THRESHOLD_LOW = 450;
 
 // 32 segments on the outer track (16 black, 16 clear) = 32 edges per channel.
 // Two channels in quadrature = 64 edges per revolution = 5.625 degrees per edge.
@@ -71,19 +71,20 @@ void setup()
 
 void loop()
 {
-  //OWN STUFF IN THE BELOW LINE 
-  encoder.update();
 
   b = millis(); // reading time
   c = b;        // storing the current time
 
   while ((b >= c) && (b <= (c + 15500)) && exitt == 0) // let the main loop to be run for 15s
   {
+    //OWN STUFF IN THE BELOW LINE 
+  encoder.update();
 
     if (b % 13 == 0 && repc == 1) // PI controller
     {
       eri = ki * (RPM - rpmm) + eri;
-      ctrl = 50 + kp * (RPM - rpmm) + eri;
+      //ctrl = 50 + kp * (RPM - rpmm) + eri;
+      ctrl = 150; //HARD CODED TESTING PURPOSES
       analogWrite(6, ctrl);
       repc = 0;
     }

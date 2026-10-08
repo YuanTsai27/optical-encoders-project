@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "quadrature_encoder.h"
+#include "quadrature-encoder.h"
 
 // Quadrature transition table is indexed by (previous_state << 2) | current_state,
 // where state = (A << 1) | B.
@@ -42,7 +42,6 @@ QuadratureEncoder::QuadratureEncoder(uint8_t pin_a_, uint8_t pin_b_, int thresho
                                         raw_b = 0;
                                      }
 
-QuadratureEncoder::~QuadratureEncoder() {}
 
 void QuadratureEncoder::begin() {
     raw_a = analogRead(pin_a);

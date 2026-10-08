@@ -1,4 +1,5 @@
 
+#include <Arduino.h>
 // TO DO:
 
 //1. Add function that returns reading from 1 sensor.

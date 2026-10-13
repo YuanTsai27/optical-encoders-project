@@ -27,7 +27,7 @@ int rep=1;     //Repetition indicator
 
 //CONFIG FOR OPTICAL ABSOLUTE ENCODER:
 const int sensorPins[5]     = {A0, A1, A2, A3, A4};   // A0 LSB, A4 MSB
-int thresholds[5]           = {512, 512, 512, 512, 512}; // calibrated for each channel (A0-A4)
+int thresholds[5]           = {512, 512, 512, 512, 880}; // calibrated for each channel (A0-A4)
 
 float lastUnwrappedAngle = 0.0;
 float cumulativeOffset = 0.0;
@@ -152,7 +152,7 @@ if (finish==1){                                //this part of the code is for di
     Serial.println(s * 360 / 228);                                      //every full Revolution of the shaft is associated with 228 counts of builtin 
                                                                           //encoder so to turn it to degre we can use this formula (s * 360 / 228), "s" is the number of  built-in encoder counts
       
-    float Error=displacement-s*360/228;
+    float Error = abs(displacement)-s*360/228;
     Serial.print("Error :");
     Serial.println(Error);                                              //displaying error
     Serial.println();

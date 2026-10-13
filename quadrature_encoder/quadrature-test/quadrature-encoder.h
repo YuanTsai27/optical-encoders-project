@@ -70,6 +70,7 @@ private:
     unsigned long window_start_ms;
 
     float rpm;
+    float dpe;
     Direction direction;
     bool reading_ready;
     uint32_t invalid_transitions;

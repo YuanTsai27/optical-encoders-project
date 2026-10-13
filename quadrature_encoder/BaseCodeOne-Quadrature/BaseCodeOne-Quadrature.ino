@@ -28,17 +28,17 @@ int t0;         // memory of time for the Purpose of displaying the results
 int repeat = 0; // repeat indicator to only let the memory of time for the Purpose of displaying the results be updated once
 
 // STUFF FOR OUR OWN IMPLEMENTATION:
-const uint8_t PIN_CHANNEL_A = A5;
-const uint8_t PIN_CHANNEL_B = A4;
-const int THRESHOLD_HIGH = 600;
-const int THRESHOLD_LOW = 400;
+const uint8_t PIN_CHANNEL_A = A4;
+const uint8_t PIN_CHANNEL_B = A5;
+const int THRESHOLD_HIGH = 550;
+const int THRESHOLD_LOW = 450;
 
 // 32 segments on the outer track (16 black, 16 clear) = 32 edges per channel.
 // Two channels in quadrature = 64 edges per revolution = 5.625 degrees per edge.
 const uint16_t EDGES_PER_REV = 64;
 
 // Speed is computed once per window set to be each second..
-const unsigned long WINDOW_MS = 1000;
+const unsigned long WINDOW_MS = 5000;
 
 QuadratureEncoder encoder(PIN_CHANNEL_A, PIN_CHANNEL_B, THRESHOLD_HIGH, THRESHOLD_LOW,
                           EDGES_PER_REV, WINDOW_MS);
@@ -83,8 +83,8 @@ void loop()
     if (b % 13 == 0 && repc == 1) // PI controller
     {
       eri = ki * (RPM - rpmm) + eri;
-      //ctrl = 50 + kp * (RPM - rpmm) + eri;
-      ctrl = 150; //HARD CODED TESTING PURPOSES
+      ctrl = 50 + kp * (RPM - rpmm) + eri;
+      //ctrl = 20; //HARD CODED TESTING PURPOSES
       analogWrite(6, ctrl);
       repc = 0;
     }
@@ -133,10 +133,10 @@ void loop()
         Serial.println((s / (228)) * 12); // formula for rpm in each 5s
 
         Serial.print("RPM from optical quadrature encoder: ");
-        Serial.println(encoder.get_rpm(), 2);
+        Serial.println(abs(encoder.get_rpm()), 2);
 
         Serial.print("Error: ");
-        Serial.println(-(s / (228)) * 12);
+        Serial.println(abs(encoder.get_rpm()))-((s / (228)) * 12);
 
         Serial.print("direction read by motor's sensor: ");
         if (dirm == 0)

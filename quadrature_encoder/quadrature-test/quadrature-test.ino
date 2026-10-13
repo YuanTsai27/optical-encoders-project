@@ -6,14 +6,14 @@
 // ---------------- Configuration ----------------
 
 // PLACEHOLDERS: set to the analog pins the two phototransistor outputs are wired to.
-const uint8_t PIN_CHANNEL_A = A5;
-const uint8_t PIN_CHANNEL_B = A4;
+const uint8_t PIN_CHANNEL_A = A4;
+const uint8_t PIN_CHANNEL_B = A5;
 
 // ADC thresholds (0 to 1023). Output is active high: light through = high reading.
 // Measured: about 900 with light passing, about 100 when blocked (midpoint 500).
 // The gap between the two thresholds is the hysteresis band, centred on the midpoint.
-const int THRESHOLD_HIGH = 600;
-const int THRESHOLD_LOW = 400;
+const int THRESHOLD_HIGH = 550;
+const int THRESHOLD_LOW = 450;
 
 // 32 segments on the outer track (16 black, 16 clear) = 32 edges per channel.
 // Two channels in quadrature = 64 edges per revolution = 5.625 degrees per edge.
@@ -52,7 +52,7 @@ void setup() {
 
 void loop() {
     encoder.update();
-    analogWrite(6, 150);
+    analogWrite(6, 500);
 
     if (CALIBRATION_MODE) {
         unsigned long now = millis();

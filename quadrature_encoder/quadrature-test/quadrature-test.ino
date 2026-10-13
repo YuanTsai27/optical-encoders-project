@@ -12,8 +12,8 @@ const uint8_t PIN_CHANNEL_B = A4;
 // ADC thresholds (0 to 1023). Output is active high: light through = high reading.
 // Measured: about 900 with light passing, about 100 when blocked (midpoint 500).
 // The gap between the two thresholds is the hysteresis band, centred on the midpoint.
-const int THRESHOLD_HIGH = 550;
-const int THRESHOLD_LOW = 450;
+const int THRESHOLD_HIGH = 600;
+const int THRESHOLD_LOW = 400;
 
 // 32 segments on the outer track (16 black, 16 clear) = 32 edges per channel.
 // Two channels in quadrature = 64 edges per revolution = 5.625 degrees per edge.

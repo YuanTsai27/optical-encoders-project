@@ -60,6 +60,7 @@ private:
     int threshold_high; // rising input must exceed this to read HIGH
     int threshold_low;  // falling input must drop below this to read LOW
     uint16_t edges_per_rev;
+    uint16_t dpe; // degrees per edge = 360 / edges_per_rev
     unsigned long window_ms;
 
     uint8_t level_a;

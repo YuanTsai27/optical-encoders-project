@@ -30,8 +30,8 @@ int repeat = 0; // repeat indicator to only let the memory of time for the Purpo
 // STUFF FOR OUR OWN IMPLEMENTATION:
 const uint8_t PIN_CHANNEL_A = A5;
 const uint8_t PIN_CHANNEL_B = A4;
-const int THRESHOLD_HIGH = 550;
-const int THRESHOLD_LOW = 450;
+const int THRESHOLD_HIGH = 600;
+const int THRESHOLD_LOW = 400;
 
 // 32 segments on the outer track (16 black, 16 clear) = 32 edges per channel.
 // Two channels in quadrature = 64 edges per revolution = 5.625 degrees per edge.

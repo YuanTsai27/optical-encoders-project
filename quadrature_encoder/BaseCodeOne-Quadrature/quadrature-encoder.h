@@ -30,18 +30,21 @@ public:
     // Latch the initial channel state. Call once in setup().
     void begin();
 
+    // Reset the edge count and window start time. Call to restart speed measurement.
+    void reset();
+
     // Sample both channels, decode any transition, and recompute RPM at the end
     // of each window. Call every loop iteration.
     void update();
 
     // Signed RPM from the last completed window: positive CW, negative CCW.
-    float get_rpm() const { return rpm; }
+    float calculate_rpm() const { return rpm; }
 
     // Direction from the last completed window.
     Direction get_direction() const { return direction; }
 
     // True once per completed window, then cleared. Use it to print results.
-    bool new_reading_available();
+    //bool new_reading_available();
 
     // Transitions where both channels changed between samples, which means an
     // edge was missed because sampling was too slow.

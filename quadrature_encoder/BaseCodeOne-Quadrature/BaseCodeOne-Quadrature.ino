@@ -128,16 +128,20 @@ void loop()
 
       if ((b - t0) % 5000 == 0)
       {
+
+        float rpm_builtin = (s / 228.0) * 12;          // formula for rpm in each 5s
+        float rpm_optical = abs(encoder.get_rpm());
+
         Serial.println();
         Serial.print("RPM from builtin encoder: ");
-        Serial.println((s / (228)) * 12); // formula for rpm in each 5s
+        Serial.println(rpm_builtin, 2);
 
         Serial.print("RPM from optical quadrature encoder: ");
-        Serial.println(abs(encoder.get_rpm()), 2);
+        Serial.println(rpm_optical, 2);
 
         Serial.print("Error: ");
-        Serial.println(abs(encoder.get_rpm()))-((s / (228)) * 12);
-
+        Serial.println(rpm_optical - rpm_builtin, 2);
+        
         Serial.print("direction read by motor's sensor: ");
         if (dirm == 0)
         {

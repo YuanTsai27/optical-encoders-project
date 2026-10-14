@@ -96,9 +96,9 @@ void QuadratureEncoder::update() {
         // Use the measured elapsed time, not the nominal window, so a late
         // update does not scale the result.
 
-        //float dps = dpe * ((float)window_edge_count / (float)elapsed) * 1000.0f; // Calculate degrees per second based on edges counted and elapsed time (1000 ms in a second).
-        //rpm = dps * (60.0f / 360.0f); // Convert degrees per second to revolutions per minute (60 seconds in a minute, 360 degrees in a revolution).
-        rpm = ((float)window_edge_count / (float)edges_per_rev) * (60000.0f / (float)elapsed);
+        float dps = dpe * ((float)window_edge_count / (float)elapsed) * 1000.0f; // Calculate degrees per second based on edges counted and elapsed time (1000 ms in a second).
+        rpm = dps * (60.0f / 360.0f); // Convert degrees per second to revolutions per minute (60 seconds in a minute, 360 degrees in a revolution).
+        //rpm = ((float)window_edge_count / (float)edges_per_rev) * (60000.0f / (float)elapsed);
 
         if (window_edge_count > 0) {
             direction = DIR_CW;

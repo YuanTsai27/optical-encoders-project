@@ -129,6 +129,7 @@ void loop()
       if ((b - t0) % 5000 == 0)
       {
         Serial.println();
+
         Serial.print("RPM from builtin encoder: ");
         Serial.println((s / (228)) * 12); // formula for rpm in each 5s
 
@@ -136,8 +137,8 @@ void loop()
         Serial.println(abs(encoder.get_rpm()), 2);
 
         Serial.print("Error: ");
-        Serial.println(abs(encoder.get_rpm()))-((s / (228)) * 12);
-
+        Serial.println(abs(encoder.get_rpm())-((s / (228)) * 12));
+        
         Serial.print("direction read by motor's sensor: ");
         if (dirm == 0)
         {

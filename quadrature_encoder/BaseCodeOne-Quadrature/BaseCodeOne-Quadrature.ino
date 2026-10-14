@@ -114,6 +114,7 @@ void loop()
     {
       t0 = b; // storing the current time once
       repeat = 1;
+     encoder.reset();
     }
 
     if (b % 100 == 0)
@@ -130,7 +131,7 @@ void loop()
       {
 
         float rpm_builtin = (s / 228.0) * 12;          // formula for rpm in each 5s
-        float rpm_optical = abs(encoder.get_rpm());
+        float rpm_optical = abs(encoder.calculate_rpm());
 
         Serial.println();
         Serial.print("RPM from builtin encoder: ");

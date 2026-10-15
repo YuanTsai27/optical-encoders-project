@@ -28,18 +28,18 @@ int rep=1;     //Repetition indicator
 //CONFIG FOR OPTICAL ABSOLUTE ENCODER:
 const int sensorPins[5]     = {A0, A1, A2, A3, A4};   // A0 LSB, A4 MSB
 int thresholds[5]           = {512, 512, 512, 512, 880}; // calibrated for each channel (A0-A4)
+float errorReadings[10];   // stores the Error from each of the 10 shaft positions
 
 float lastUnwrappedAngle = 0.0;
 float cumulativeOffset = 0.0;
 float previousRawAngle = 0.0;
 float initialUnwrappedAngle = 0.0;
-bool  initialSet = false;
 
 
 
 
 void setup() {
-  
+
   Serial.begin(250000);                                                 //Baud rate of communication 
 
   Serial.println("Enter the desired rotation in degree.");  
@@ -54,7 +54,16 @@ void setup() {
   {
     analogWrite(3,255);                                                   //change the direction of rotation by applying voltage to pin 3 of arduino
   }
-  deg=abs(deg);                                       
+  deg=abs(deg);       
+  
+  //Initializing the home position of the shaft by reading the absolute encoder's gray code and converting it to degrees
+  byte homeGray   = read_all_sensors(sensorPins, thresholds);
+  byte homeBinary = convert_gray_to_binary(homeGray);
+  float homeAngle = convert_binary_to_degrees(homeBinary);
+
+  previousRawAngle      = homeAngle;
+  initialUnwrappedAngle = homeAngle;
+  lastUnwrappedAngle    = homeAngle;
 }
 
 
@@ -124,18 +133,14 @@ if (finish==1){                                //this part of the code is for di
       byte binary  = convert_gray_to_binary(gray);
       float rawAngle  = convert_binary_to_degrees(binary);
 
-      if (!initialSet) {
-      previousRawAngle      = rawAngle;
-      initialUnwrappedAngle = rawAngle;
-      initialSet = true;
-    }
 
+// Unwrapping the angle to handle wrapping around 0/360 degrees
     float unwrapped = unwrap_angle(rawAngle, previousRawAngle, cumulativeOffset);
     previousRawAngle = rawAngle;
-
+// Calculating the angular displacement from the last unwrapped angle
     float displacement = calculate_angular_displacement(lastUnwrappedAngle, unwrapped);
     lastUnwrappedAngle = unwrapped; 
-
+// Getting the direction of rotation based on the displacement
     const char* direction = get_direction(displacement);     
       
     // increasing the repetition indicator
@@ -156,6 +161,14 @@ if (finish==1){                                //this part of the code is for di
     Serial.print("Error :");
     Serial.println(Error);                                              //displaying error
     Serial.println();
+    errorReadings[rep - 2] = Error;   // rep was just incremented, so rep-2 is the 0-based index for this round
+
+    if (rep - 1 == 10) {   // all 10 readings have now been stored
+      float meanBest8 = calculate_mean_of_best_readings(errorReadings, 10);
+      Serial.print("Mean error (8 best out of 10): ");
+      Serial.println(meanBest8);
+      Serial.println();
+    }
     s = 0;
     finish=0; 
 }

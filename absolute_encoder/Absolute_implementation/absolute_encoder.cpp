@@ -62,10 +62,29 @@ float unwrap_angle(float raw_angle, float previous_raw_angle, float &cumulative_
 
 // This function determines the direction of rotation based on the displacement. It returns "CW" for clockwise, "CCW" for counterclockwise, and "--" for no movement.
 const char* get_direction(float displacement) {
-  if (displacement > 0) return "CW";
-  if (displacement < 0) return "CCW";
+  if (displacement < 0) return "CW";
+  if (displacement > 0) return "CCW";
   return "--";
 }
 
-
 //6. Find the mean of 8 out of 10 best readings.
+float calculate_mean_of_best_readings(float differences[], int count) {
+  // Simple bubble sort by ABSOLUTE VALUE (smallest deviation first)
+  for (int i = 0; i < count - 1; i++) {
+    for (int j = 0; j < count - i - 1; j++) {
+      if (abs(differences[j]) > abs(differences[j + 1])) {
+        float temp = differences[j];
+        differences[j] = differences[j + 1];
+        differences[j + 1] = temp;
+      }
+    }
+  }
+
+  // Take the (count - 2) best readings, drop the 2 largest deviations
+  int best_count = count - 2;
+  float sum = 0;
+  for (int i = 0; i < best_count; i++) {
+    sum += abs(differences[i]);   // unsigned average, as required by the assignment
+  }
+  return sum / best_count;
+}

@@ -14,3 +14,5 @@ float calculate_angular_displacement(float initial_unwrapped_angle, float curren
 float unwrap_angle(float raw_angle, float previous_raw_angle, float &cumulative_offset);
 
 const char* get_direction(float displacement);
+
+float calculate_mean_of_best_readings(float differences[], int count);

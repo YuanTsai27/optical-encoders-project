@@ -41,7 +41,7 @@ QuadratureEncoder::QuadratureEncoder(uint8_t pin_a_, uint8_t pin_b_, int thresho
     invalid_transitions = 0;
     raw_a = 0;
     raw_b = 0;
-    dpe = 360 / edges_per_rev_;
+    dpe = 360.0f / (float)edges_per_rev_;
 }
 
 void QuadratureEncoder::begin()

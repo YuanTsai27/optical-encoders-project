@@ -1,3 +1,5 @@
+// updated
+
 #pragma once
 
 #include <Arduino.h>
@@ -37,8 +39,9 @@ public:
     // of each window. Call every loop iteration.
     void update();
 
-    // Signed RPM from the last completed window: positive CW, negative CCW.
-    float calculate_rpm() const { return rpm; }
+    // Signed RPM over the time since the last call: positive CW, negative CCW.
+    // Also updates direction and restarts the measurement window.
+    float calculate_rpm();
 
     // Direction from the last completed window.
     Direction get_direction() const { return direction; }

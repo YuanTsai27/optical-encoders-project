@@ -131,7 +131,7 @@ void loop()
       {
 
         float rpm_builtin = (s / 228.0) * 12;          // formula for rpm in each 5s
-        float rpm_optical = abs(encoder.calculate_rpm());
+        float rpm_optical = fabs(encoder.calculate_rpm()); // fabs, not abs: Arduino's abs() macro would call calculate_rpm() twice
 
         Serial.println();
         Serial.print("RPM from builtin encoder: ");

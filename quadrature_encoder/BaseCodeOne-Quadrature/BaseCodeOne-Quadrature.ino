@@ -27,24 +27,21 @@ int repc = 1;   // repetition condition of PI controller
 int t0;         // memory of time for the Purpose of displaying the results
 int repeat = 0; // repeat indicator to only let the memory of time for the Purpose of displaying the results be updated once
 
-// STUFF FOR OUR OWN IMPLEMENTATION:
+// added stuff for own quadrature encoder below
 const uint8_t PIN_CHANNEL_A = A4;
 const uint8_t PIN_CHANNEL_B = A5;
 const int THRESHOLD_HIGH = 550;
 const int THRESHOLD_LOW = 450;
 
 // 32 segments on the outer track (16 black, 16 clear) = 32 edges per channel.
-// Two channels in quadrature = 64 edges per revolution = 5.625 degrees per edge.
+// two channels in quadrature = 64 edges per revolution
 const uint16_t EDGES_PER_REV = 64;
 
-// Speed is computed once per window set to be each second..
-const unsigned long WINDOW_MS = 5000;
+// measurement window duration in ms
+const unsigned long WINDOW_MS = 5000; // 5s
 
 QuadratureEncoder encoder(PIN_CHANNEL_A, PIN_CHANNEL_B, THRESHOLD_HIGH, THRESHOLD_LOW,
                           EDGES_PER_REV, WINDOW_MS);
-
-unsigned long last_calibration_print_ms = 0;
-
 
 void setup()
 {
@@ -65,7 +62,7 @@ void setup()
   }
   RPM = abs(RPM);
 
-  // OWN STUFF BELOW
+  // initialize our own quadrature encoder
   encoder.begin();
 }
 
@@ -77,7 +74,7 @@ void loop()
 
   while ((b >= c) && (b <= (c + 15500)) && exitt == 0) // let the main loop to be run for 15s
   {
-    //OWN STUFF IN THE BELOW LINE 
+  // own quadrature encoder update function
   encoder.update();
 
     if (b % 13 == 0 && repc == 1) // PI controller
@@ -119,12 +116,12 @@ void loop()
 
     if (b % 100 == 0)
     {
-      Serial.print("time in ms: ");
-      Serial.print(b - t0);
+      //Serial.print("time in ms: ");
+      //Serial.print(b - t0);
 
-      Serial.print("  spontaneous speed from builtin encoder:  ");
+      //Serial.print("  spontaneous speed from builtin encoder:  ");
       rpmm = (s_2 / (2 * 114)) * 600; // formulation for rpm in each 100ms for PI controller
-      Serial.println(rpmm);
+      //Serial.println(rpmm);
       s_2 = 0; // reseting the counters of PI controller rpm meter
 
       if ((b - t0) % 5000 == 0)
@@ -191,7 +188,7 @@ void loop()
   exitt = 1;         // changing the exit condition to prevent the motor to run after 15s
 }
 
-// OWN HELPER BELOW FOR CONVERTING DIRECTION TO STRING 
+// own helper below for converting the direction enum to string for printing 
 const char *direction_to_text(Direction direction) {
     switch (direction) {
     case DIR_CW:

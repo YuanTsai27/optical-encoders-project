@@ -6,16 +6,6 @@
 #include <math.h>
 #include <stdint.h>
 
-// Optical quadrature encoder read from two analog LED/phototransistor channels.
-// Disk: outer track of the 6-track Gray code disk, 32 segments (16 black, 16 clear).
-// Decoding: both edges on both channels (4x), giving 64 edges per revolution,
-//   i.e. 360 / 64 = 5.625 degrees per edge.
-// Speed: RPM = (edges / edges_per_rev) * (60000 / window_ms)
-
-// Signals are polled with analogRead(), so update() must be called as often as
-// possible. At 360 RPM there are 384 edges/s (one every ~2.6 ms), so the main
-// loop must never block for longer than ~1 ms.
-
 enum Direction
 {
     DIR_STOPPED,
@@ -23,42 +13,42 @@ enum Direction
     DIR_CCW
 };
 
+// QuadratureEncoder class definition
 class QuadratureEncoder
 {
 public:
     QuadratureEncoder(uint8_t pin_a, uint8_t pin_b, int threshold_high, int threshold_low,
                       uint16_t edges_per_rev, unsigned long window_ms);
 
-    // Latch the initial channel state. Call once in setup().
+    // to initialise channel state, called once in setup()
     void begin();
 
-    // Reset the edge count and window start time. Call to restart speed measurement.
+    // reset function at the start of each measurement window
     void reset();
 
-    // Sample both channels, decode any transition, and recompute RPM at the end
-    // of each window. Call every loop iteration.
+    // function called every loop iteraction to sample both channels, decode any transition, and recompute RPM at the end of each window
     void update();
 
-    // Signed RPM over the time since the last call: positive CW, negative CCW.
-    // Also updates direction and restarts the measurement window.
+    // to return signed RPM over the time since the last call: positive = CW, negative = CCW.
+    // also restarts the measurement window.
     float calculate_rpm();
 
-    // Direction from the last completed window.
+    // getter for direction from the last completed window.
     Direction get_direction() const { return direction; }
 
-    // True once per completed window, then cleared. Use it to print results.
-    //bool new_reading_available();
-
-    // Transitions where both channels changed between samples, which means an
-    // edge was missed because sampling was too slow.
+    // getter for no. invalid transitions (debugging analysis)
     uint32_t get_invalid_transitions() const { return invalid_transitions; }
 
-    // Raw ADC values from the latest sample, for threshold calibration.
+    // getter for raw ADC values from the latest sample for viewing (debugging analysis)
     int get_raw_a() const { return raw_a; }
     int get_raw_b() const { return raw_b; }
 
+    // getter for Logic levels (0 or 1), for viewing the square wave (debugging analysis)
+    uint8_t get_level_a() const { return level_a; }
+    uint8_t get_level_b() const { return level_b; }
+
 private:
-    // Convert an analog reading to a logic level with hysteresis.
+    // convert an analog reading to a logic level with hysteresis.
     uint8_t to_logic(int raw, uint8_t previous_level) const;
 
     uint8_t pin_a;
@@ -78,7 +68,6 @@ private:
     float rpm;
     float dpe;
     Direction direction;
-    bool reading_ready;
     uint32_t invalid_transitions;
 
     int raw_a;

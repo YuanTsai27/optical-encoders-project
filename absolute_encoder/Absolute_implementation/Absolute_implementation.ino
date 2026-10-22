@@ -1,3 +1,9 @@
+#pragma once
+#include <Arduino.h>
+#include <HardwareSerial.h>
+#include <stdint.h>
+#include "absolute_encoder.h"
+
 float deg=45; // Rotation degree
 float s = 0;  //Encoder counts
 int sm1 = 0;  //Built-in chanel 1
@@ -19,10 +25,21 @@ int finish=0;  //finish indicator
 int rep=1;     //Repetition indicator
 
 
+//CONFIG FOR OPTICAL ABSOLUTE ENCODER:
+const int sensorPins[5]     = {A0, A1, A2, A3, A4};   // A0 LSB, A4 MSB
+int thresholds[5]           = {512, 512, 512, 512, 880}; // calibrated for each channel (A0-A4)
+float errorReadings[10];   // stores the Error from each of the 10 shaft positions
+
+float lastUnwrappedAngle = 0.0;
+float cumulativeOffset = 0.0;
+float previousRawAngle = 0.0;
+float initialUnwrappedAngle = 0.0;
+
+
 
 
 void setup() {
-  
+
   Serial.begin(250000);                                                 //Baud rate of communication 
 
   Serial.println("Enter the desired rotation in degree.");  
@@ -37,7 +54,16 @@ void setup() {
   {
     analogWrite(3,255);                                                   //change the direction of rotation by applying voltage to pin 3 of arduino
   }
-  deg=abs(deg);                                       
+  deg=abs(deg);       
+  
+  //Initializing the home position of the shaft by reading the absolute encoder's gray code and converting it to degrees
+  byte homeGray   = read_all_sensors(sensorPins, thresholds);
+  byte homeBinary = convert_gray_to_binary(homeGray);
+  float homeAngle = convert_binary_to_degrees(homeBinary);
+
+  previousRawAngle      = homeAngle;
+  initialUnwrappedAngle = homeAngle;
+  lastUnwrappedAngle    = homeAngle;
 }
 
 
@@ -51,11 +77,6 @@ float ki = .02;                               //integral gain of PI
 
 void loop() {
   // put your main code here, to run repeatedly:
-
-
-
-
-
     
 t=millis();                 //reading time
 t0=t;                       //sving the current time in memory
@@ -106,23 +127,50 @@ finish=1;             //cghanging finish indicator
 
 if (finish==1){                                //this part of the code is for displaying the result
       delay(500);                              //half second delay
-      rep=rep+1;                               // increasing the repetition indicator
-      Serial.print("shaft possition from optical absolute sensor from home position: ");
-      Serial.println(0);
+      rep=rep+1;   
+
+      byte gray    = read_all_sensors(sensorPins, thresholds);
+      byte binary  = convert_gray_to_binary(gray);
+      float rawAngle  = convert_binary_to_degrees(binary);
+
+
+// Unwrapping the angle to handle wrapping around 0/360 degrees
+    float unwrapped = unwrap_angle(rawAngle, previousRawAngle, cumulativeOffset);
+    previousRawAngle = rawAngle;
+// Calculating the angular displacement from the last unwrapped angle
+    float displacement = calculate_angular_displacement(lastUnwrappedAngle, unwrapped);
+    lastUnwrappedAngle = unwrapped; 
+// Getting the direction of rotation based on the displacement
+    const char* direction = get_direction(displacement);     
       
-      Serial.print("shaft displacement from optical absolute sensor: ");
-      Serial.println(0);
+    // increasing the repetition indicator
+    Serial.print("shaft possition from optical absolute sensor from home position: ");
+    Serial.println(unwrapped-initialUnwrappedAngle);
+
+    Serial.print("shaft displacement from optical absolute sensor: ");
+    Serial.println(displacement);
+
+    Serial.print("Direction of rotation: ");
+    Serial.println(direction);
       
-      Serial.print("Shaft displacement from motor's builtin encoder: ");
-      Serial.println(s * 360 / 228);                                      //every full Revolution of the shaft is associated with 228 counts of builtin 
+    Serial.print("Shaft displacement from motor's builtin encoder: ");
+    Serial.println(s * 360 / 228);                                      //every full Revolution of the shaft is associated with 228 counts of builtin 
                                                                           //encoder so to turn it to degre we can use this formula (s * 360 / 228), "s" is the number of  built-in encoder counts
       
-      float Error=0-s*360/228;
-      Serial.print("Error :");
-      Serial.println(Error);                                              //displaying error
+    float Error = abs(displacement)-s*360/228;
+    Serial.print("Error :");
+    Serial.println(Error);                                              //displaying error
+    Serial.println();
+    errorReadings[rep - 2] = Error;   // rep was just incremented, so rep-2 is the 0-based index for this round
+
+    if (rep - 1 == 10) {   // all 10 readings have now been stored
+      float meanBest8 = calculate_mean_of_best_readings(errorReadings, 10);
+      Serial.print("Mean error (8 best out of 10): ");
+      Serial.println(meanBest8);
       Serial.println();
-      s = 0;
-      finish=0; 
+    }
+    s = 0;
+    finish=0; 
 }
 analogWrite(6,0);                                                         //turning off the motor
 }
